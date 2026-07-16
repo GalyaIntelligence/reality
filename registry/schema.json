@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://galya.ai/schemas/validators-registry.json",
+  "title": "Galya Validators Registry",
+  "description": "Shared registry mapping validator names to pinned external repos. At least one language entrypoint is required; both are allowed.",
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "#/$defs/validatorEntry"
+  },
+  "$defs": {
+    "validatorEntry": {
+      "type": "object",
+      "required": ["repo", "commit", "entrypoints", "latency_class", "maintainer"],
+      "additionalProperties": false,
+      "properties": {
+        "repo": {
+          "type": "string",
+          "format": "uri",
+          "description": "Git clone URL of the validator repository"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "Full 40-character commit SHA (not a branch or tag)"
+        },
+        "entrypoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "python": {
+              "type": "string",
+              "description": "module:ClassName entrypoint for the Python SDK",
+              "minLength": 1
+            },
+            "ts": {
+              "type": "string",
+              "description": "module:ClassName entrypoint for the TypeScript SDK",
+              "minLength": 1
+            }
+          },
+          "anyOf": [
+            { "required": ["python"] },
+            { "required": ["ts"] }
+          ]
+        },
+        "latency_class": {
+          "type": "string",
+          "enum": ["inline", "async"]
+        },
+        "maintainer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parity_fixture": {
+          "type": "string",
+          "description": "Path relative to the validator repo root. Required iff both entrypoints are present."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["python-only", "ts-only", "both"],
+          "description": "Language completeness flag. Must match which entrypoints are declared."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "entrypoints": {
+                "required": ["python", "ts"]
+              }
+            }
+          },
+          "then": {
+            "required": ["parity_fixture", "status"],
+            "properties": {
+              "status": { "const": "both" },
+              "parity_fixture": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "entrypoints": {
+                "required": ["python"],
+                "not": { "required": ["ts"] }
+              }
+            }
+          },
+          "then": {
+            "required": ["status"],
+            "properties": {
+              "status": { "const": "python-only" }
+            },
+            "not": { "required": ["parity_fixture"] }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "entrypoints": {
+                "required": ["ts"],
+                "not": { "required": ["python"] }
+              }
+            }
+          },
+          "then": {
+            "required": ["status"],
+            "properties": {
+              "status": { "const": "ts-only" }
+            },
+            "not": { "required": ["parity_fixture"] }
+          }
+        }
+      ]
+    }
+  }
+}

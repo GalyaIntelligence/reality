@@ -1,0 +1,84 @@
+---
+title: Galya
+description: Galya-maintained validators in the shared catalog.
+---
+
+# Galya
+
+Galya ships first-party validators under the `galya-*` naming convention.
+They follow the same install and `judge()` API as any other catalog entry.
+
+## Available now
+
+| Name | Languages | What it judges |
+|------|-----------|----------------|
+| `galya-taste` | Python & TypeScript (as published) | Brand / taste alignment of agent replies |
+
+More Galya validators will appear here as they are added to the catalog.
+
+## Usage
+
+### Python
+
+```python
+import galya_reality as reality
+from galya_reality import Message, ContextWindow
+
+client = reality.validator("galya-taste")
+
+message = Message(role="assistant", content="Thanks — happy to help within our guidelines.")
+context = ContextWindow(messages=[
+    Message(role="user", content="Write a short brand-safe reply."),
+    message,
+])
+
+await client.index(message, context)
+result = await client.judge(message, context)
+
+print(result.score)
+print(result.explanations)
+```
+
+### TypeScript
+
+```typescript
+import { validator, type Message, type ContextWindow } from "@galya/reality";
+
+const client = await validator("galya-taste");
+
+const message: Message = {
+  role: "assistant",
+  content: "Thanks — happy to help within our guidelines.",
+};
+const context: ContextWindow = {
+  messages: [
+    { role: "user", content: "Write a short brand-safe reply." },
+    message,
+  ],
+};
+
+await client.index(message, context);
+const result = await client.judge(message, context);
+
+console.log(result.score, result.explanations);
+```
+
+Example result:
+
+```json
+{
+  "score": 0.92,
+  "label": "pass",
+  "rationale": "Response aligns with expected taste signals",
+  "explanations": [
+    "Tone matches brand voice",
+    "No policy-sensitive content detected"
+  ],
+  "metadata": {}
+}
+```
+
+## Frameworks
+
+Wire `galya-taste` (or any catalog name) into agent stacks under
+[Integrations](/docs/integrations) — Mastra scorers and LangGraph judge nodes.

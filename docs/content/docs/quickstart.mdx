@@ -1,0 +1,51 @@
+---
+title: Quick start
+description: Install Galya Reality and score your first context window.
+---
+
+## Python
+
+```bash
+pip install galya-reality
+```
+
+```python
+import galya_reality as reality
+from galya_reality import Message, ContextWindow
+
+client = reality.validator("galya-taste")
+
+message = Message(role="user", content="Looks good to me")
+context = ContextWindow(messages=[message])
+
+await client.index(message, context)
+result = await client.judge(message, context)
+
+print(result.score)
+print(result.label)
+print(result.explanations)  # optional list[str] | None
+```
+
+## TypeScript
+
+```bash
+npm install @galya/reality
+```
+
+```typescript
+import { validator, type Message, type ContextWindow } from "@galya/reality";
+
+const client = await validator("galya-taste");
+
+const message: Message = { role: "user", content: "Looks good to me" };
+const context: ContextWindow = { messages: [message] };
+
+await client.index(message, context);
+const result = await client.judge(message, context);
+
+console.log(result.score);
+console.log(result.label);
+console.log(result.explanations); // optional string[]
+```
+
+Set `GALYA_AUTO_INSTALL=1` to skip the interactive install prompt on first use.

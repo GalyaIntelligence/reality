@@ -1,0 +1,17 @@
+{
+  "message": {
+    "role": "user",
+    "content": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  "context": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    ]
+  },
+  "expect": {
+    "score_tolerance": 0.01
+  }
+}

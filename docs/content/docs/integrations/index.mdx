@@ -1,0 +1,19 @@
+---
+title: Overview
+description: Use Galya Reality inside agent frameworks.
+---
+
+# Integrations
+
+Wire Galya validators into the frameworks you already use. Integrations are
+**plug-ins** — your agent stays normal and fully customizable; Galya only maps
+`index` / `judge` onto that framework’s scorer or graph APIs.
+
+| Framework | Language | Pattern |
+|-----------|----------|---------|
+| [Mastra](/docs/integrations/mastra) | TypeScript | `createGalyaScorer` on your Agent’s `scorers` |
+| [LangGraph](/docs/integrations/langgraph) | Python | `make_galya_index_node` / `make_galya_judge_node` in your graph |
+
+Runnable code and tests live under
+[`examples/mastra`](https://github.com/GalyaIntelligence/reality/tree/main/examples/mastra) and
+[`examples/langgraph`](https://github.com/GalyaIntelligence/reality/tree/main/examples/langgraph).

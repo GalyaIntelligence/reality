@@ -1,0 +1,14 @@
+---
+title: Configuration
+description: Environment variables for install, cache, and catalog overrides.
+---
+
+| Variable | Purpose |
+|----------|---------|
+| `GALYA_AUTO_INSTALL=1` | Skip the install confirmation prompt |
+| `GALYA_REGISTRY_URL` | Optional custom catalog URL |
+| `GALYA_CACHE_DIR` | Override cache directory (default `~/.cache/galya-reality`) |
+
+Validators may be available in Python, TypeScript, or both. If you request a
+name that isn’t available in your language, Reality raises a clear error
+listing which languages *are* supported.

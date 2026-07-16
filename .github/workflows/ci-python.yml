@@ -1,0 +1,36 @@
+name: CI Python
+on:
+  push:
+    paths:
+      - "packages/python/**"
+      - "registry/**"
+      - "scripts/**"
+      - "tests/parity/**"
+      - "examples/write_your_own_validator/**"
+      - ".github/workflows/ci-python.yml"
+  pull_request:
+    paths:
+      - "packages/python/**"
+      - "registry/**"
+      - "scripts/**"
+      - "tests/parity/**"
+      - "examples/write_your_own_validator/**"
+      - ".github/workflows/ci-python.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install
+        run: pip install -e "packages/python[dev]"
+      - name: Pytest (SDK)
+        run: pytest packages/python -q
+      - name: Parity (example_both)
+        run: pytest tests/parity -q

@@ -1,0 +1,99 @@
+---
+title: Write your own
+description: Build a validator in your own repo and register it in the Galya catalog.
+---
+
+# Write your own
+
+Validators live in **your** repository. This repo only hosts the SDK and the
+shared registry. Use the templates under
+[`examples/write_your_own_validator/`](https://github.com/GalyaIntelligence/reality/tree/main/examples/write_your_own_validator).
+
+## 1. Choose languages
+
+| You ship | Template |
+|----------|----------|
+| Python only | `python_template/` |
+| TypeScript only | `ts_template/` |
+| Both | Both templates + a `parity_fixture.json` |
+
+Single-language validators are fully supported. Callers in the other language
+get a clear `LanguageNotSupportedError`.
+
+## 2. Implement the interface
+
+### Python (sketch)
+
+```python
+class MyValidator:
+    name = "my-validator"
+    latency_class = "inline"  # or "async"
+
+    async def index(self, message, context) -> None:
+        return None
+
+    def judge(self, message, context):
+        score = 1.0 if "ok" in message.content.lower() else 0.0
+        return ValidationResult(
+            score=score,
+            label="pass" if score >= 0.5 else "fail",
+            explanations=["Matched keyword"] if score == 1.0 else ["No match"],
+        )
+```
+
+`judge()` must **not** mutate `message` or `context`. Prefer returning
+`explanations` when callers benefit from structured reasons.
+
+### TypeScript
+
+Mirror the same fields (`name`, `latencyClass`, `index`, `judge`) using the
+TS template. When shipping both languages, scores must agree on the parity
+fixture within ±0.01 (or matching labels).
+
+## 3. Manifest and release
+
+Ship a `validator.yaml` that declares your entrypoint(s), tag a release, and
+note the exact **40-character** commit SHA you want pinned.
+
+## 4. Register in the catalog
+
+Open a PR that adds **exactly one** entry to
+[`registry/index.json`](https://github.com/GalyaIntelligence/reality/blob/main/registry/index.json).
+
+```json
+{
+  "my-validator": {
+    "repo": "https://github.com/you/validator-my-name",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "entrypoints": {
+      "python": "validator:MyValidator",
+      "ts": "validator.ts:MyValidator"
+    },
+    "latency_class": "inline",
+    "maintainer": "@you",
+    "status": "both",
+    "parity_fixture": "fixtures/parity_case_01.json"
+  }
+}
+```
+
+Rules:
+
+- `commit` is a full SHA (not a branch or tag)
+- `entrypoints` has at least one of `python` / `ts`
+- `status` is `python-only`, `ts-only`, or `both` and matches entrypoints
+- `parity_fixture` is **required** for `both`, **omitted** for single-language
+
+## 5. What CI checks
+
+On registry PRs, CI validates schema and language rules, clones the pinned
+commit, imports each entrypoint, and — when both languages are present — runs
+parity against the fixture.
+
+## Trust model
+
+Installed validators run as third-party code in your process — the same model
+as any pip/npm package. Read [Security](/docs/security) before using community
+validators in production.
+
+Full contributor notes: [CONTRIBUTING.md](https://github.com/GalyaIntelligence/reality/blob/main/CONTRIBUTING.md).

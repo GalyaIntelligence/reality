@@ -1,0 +1,29 @@
+---
+title: Agent skills
+description: Point coding agents at skills.md — Galya Reality API plus Fumadocs doc retrieval.
+---
+
+# Agent skills
+
+**For agents:** load [`skills.md`](https://github.com/GalyaIntelligence/reality/blob/main/skills.md) at the start of a task that uses Galya Reality or this documentation site.
+
+That file teaches:
+
+1. **SDK usage** — `validator` → `index` / `judge` / `ValidationResult`
+2. **Integrations** — Mastra scorers, LangGraph judge nodes
+3. **Fumadocs retrieval** — `/llms.txt`, `/docs/...md`, `/api/search` (do not scrape HTML)
+
+Cursor users in this repo also get [`.cursor/skills/galya-reality/SKILL.md`](https://github.com/GalyaIntelligence/reality/blob/main/.cursor/skills/galya-reality/SKILL.md).
+
+## Fumadocs endpoints (this site)
+
+| Endpoint | Use |
+|----------|-----|
+| [`/llms.txt`](/llms.txt) | List all docs pages |
+| `/docs/{slug}.md` | Clean markdown for a page |
+| `/llms.mdx/docs/{slug}/content.md` | Same content via LLM route |
+| [`/api/search?query=`](/api/search?query=judge) | Keyword search |
+
+Example: [API model (markdown)](/docs/capabilities/api-model.md)
+
+This matches the Fumadocs [`read-docs`](https://agentskills.so/skills/fuma-nama-fumadocs-read-docs) skill pattern.

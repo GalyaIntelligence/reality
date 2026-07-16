@@ -1,0 +1,5 @@
+name: example-both
+latency_class: inline
+entrypoints:
+  python: validator:ExampleBothValidator
+  ts: validator.js:ExampleBothValidator

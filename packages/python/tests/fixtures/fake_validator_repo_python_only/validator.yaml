@@ -1,0 +1,4 @@
+name: fake-python-only
+latency_class: inline
+entrypoints:
+  python: validator:FakePythonOnlyValidator

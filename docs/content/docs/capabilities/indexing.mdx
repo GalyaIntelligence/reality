@@ -1,0 +1,86 @@
+---
+title: index()
+description: Stream messages into a validator before scoring with judge().
+---
+
+# index()
+
+`index(message, context)` lets a validator **observe** context as it grows —
+embeddings, running state, caches — without producing a score yet.
+
+It returns nothing. Scoring always happens in [judge()](/docs/capabilities/judge).
+
+## Signature
+
+```text
+index(message: Message, context: ContextWindow) → void (async)
+```
+
+- **`message`** — the latest turn to incorporate
+- **`context`** — the full window the validator may use (typically including
+  `message` plus prior turns)
+
+`index` must **not** mutate `message` or `context` by contract (same as
+`judge`). Side effects stay inside the validator’s own state.
+
+## When to call it
+
+| Pattern | Usage |
+|---------|--------|
+| Streaming agent turns | Call `index` on each new message as it arrives |
+| Batch / offline | Call `index` once (or skip if the validator is stateless) then `judge` |
+| Stateless validators | `index` may be a no-op; still safe to call |
+
+Many validators are effectively stateless and ignore `index`. Calling it keeps
+your pipeline uniform when you swap catalog names.
+
+## Python
+
+```python
+from galya_reality import Message, ContextWindow
+
+client = reality.validator("galya-taste")
+
+history: list[Message] = []
+
+async def on_turn(role: str, content: str) -> None:
+    msg = Message(role=role, content=content)
+    history.append(msg)
+    context = ContextWindow(messages=list(history))
+    await client.index(msg, context)
+```
+
+## TypeScript
+
+```typescript
+import { validator, type Message, type ContextWindow } from "@galya/reality";
+
+const client = await validator("galya-taste");
+const history: Message[] = [];
+
+async function onTurn(role: string, content: string) {
+  const msg: Message = { role, content };
+  history.push(msg);
+  const context: ContextWindow = { messages: [...history] };
+  await client.index(msg, context);
+}
+```
+
+## With judge()
+
+Typical loop: index as you go, judge when you need a decision.
+
+```python
+await client.index(message, context)
+result = await client.judge(message, context)
+```
+
+You can call `judge` without a prior `index` if the validator only needs the
+arguments passed into that `judge` call. Prefer indexing in streaming agents so
+validators that *do* keep state stay accurate.
+
+## Latency
+
+Validators declare `latency_class` / `latencyClass` as `"inline"` or `"async"`.
+That describes expected cost of `index` / `judge` work — it does not change the
+client API (always awaitable on the SDK client).

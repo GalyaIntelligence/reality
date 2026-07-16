@@ -1,0 +1,25 @@
+[project]
+name = "galya-reality-langgraph-example"
+version = "0.0.0"
+description = "LangGraph + Galya Reality example"
+requires-python = ">=3.11"
+dependencies = [
+  "galya-reality",
+  "langgraph>=0.2.0",
+  "langchain-core>=0.3.0",
+  "langchain-openai>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+]
+
+[tool.uv.sources]
+galya-reality = { path = "../../packages/python", editable = true }
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["."]

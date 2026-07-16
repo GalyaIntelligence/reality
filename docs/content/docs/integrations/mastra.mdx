@@ -1,0 +1,92 @@
+---
+title: Mastra
+description: Plug Galya Reality into your Mastra agent via createGalyaScorer — agent stays yours.
+---
+
+# Mastra
+
+Attach Galya as a **Mastra scorer**. Your agent config (model, tools, instructions,
+memory) stays normal and fully customizable — Galya only scores generations.
+
+## Install
+
+```bash
+npm install @galya/reality @mastra/core @ai-sdk/openai
+```
+
+Requires `@mastra/core` **≥ 1.x**. Full runnable example:
+[`examples/mastra`](https://github.com/GalyaIntelligence/reality/tree/main/examples/mastra).
+
+## Plug into your agent
+
+```typescript
+import { Agent } from "@mastra/core/agent";
+import { openai } from "@ai-sdk/openai";
+import { createGalyaScorer } from "./galya-scorer.js"; // from examples/mastra
+
+const galyaScorer = createGalyaScorer({
+  validatorName: "galya-taste",
+});
+
+const agent = new Agent({
+  id: "support-agent",
+  name: "support-agent",
+  instructions: "You are a helpful support agent. Write concise, brand-safe replies.",
+  model: openai("gpt-4o-mini"),
+  // …tools, memory, workflows — whatever you already use
+  scorers: {
+    galya: {
+      scorer: galyaScorer,
+      sampling: { type: "ratio", rate: 1 },
+    },
+  },
+});
+
+const result = await agent.generate([
+  { role: "user", content: "Write a short brand-safe thank-you." },
+]);
+```
+
+### What Galya owns vs what you own
+
+| Yours | Galya (`createGalyaScorer`) |
+|-------|----------------------------|
+| Agent id, instructions, model | Resolve catalog validator |
+| Tools, memory, workflows | Map run I/O → `Message` / `ContextWindow` |
+| When / how you call `generate` | `index` → `judge` → score + reason |
+
+### Configure
+
+| Env / option | Default | Purpose |
+|--------------|---------|---------|
+| `OPENAI_API_KEY` | — | Live LLM (your agent) |
+| `GALYA_VALIDATOR_NAME` / `validatorName` | `galya-taste` | Catalog validator |
+| `getClient` | `validator(name)` | Inject mock Galya client (tests) |
+
+```bash
+cd examples/mastra
+OPENAI_API_KEY=sk-... npm run example
+```
+
+## Scorer alone (no agent)
+
+```bash
+npm run example:scorer
+```
+
+```typescript
+const scorer = createGalyaScorer({ validatorName: "galya-taste" });
+const out = await scorer.run({
+  input: { inputMessages: [{ role: "user", content: "…" }] },
+  output: [{ role: "assistant", content: "…" }],
+});
+// out.score, out.reason
+```
+
+## Tests
+
+```bash
+cd examples/mastra && npm test
+```
+
+Mocks cover score + reason mapping — no API key or live registry required.

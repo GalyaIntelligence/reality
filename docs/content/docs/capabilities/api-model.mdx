@@ -1,0 +1,109 @@
+---
+title: API model
+description: SDK types, validator() resolution, and the client surface.
+---
+
+# API model
+
+The public model is intentionally small: a few data types, one factory
+(`validator`), and a client with `index` / `judge`.
+
+## Data types
+
+### Message
+
+A single turn in the conversation.
+
+| Field | Type | Required |
+|-------|------|----------|
+| `role` | `string` | yes |
+| `content` | `string` | yes |
+| `metadata` | `object` | no |
+
+### ContextWindow
+
+The window the validator may read when judging.
+
+| Field | Type | Required |
+|-------|------|----------|
+| `messages` | `Message[]` | yes |
+| `metadata` | `object` | no |
+
+### ValidationResult
+
+Returned by `judge()`. See [judge()](/docs/capabilities/judge).
+
+| Field | Type | Required |
+|-------|------|----------|
+| `score` | `number` | yes |
+| `label` | `string` | no |
+| `rationale` | `string` | no |
+| `explanations` | `string[]` | no |
+| `metadata` | `object` | no |
+
+## `validator(name)`
+
+Resolves a catalog name, installs the pinned commit if needed, and returns a
+**singleton** client for that name (one validator per client — no fan-out).
+
+### Python
+
+```python
+import galya_reality as reality
+
+client = reality.validator("galya-taste")  # sync factory
+# client: ValidatorClient
+```
+
+Optional kwargs: `confirm`, `cache_dir`, `registry`, `skip_smoke`.
+
+### TypeScript
+
+```typescript
+import { validator } from "@galya/reality";
+
+const client = await validator("galya-taste"); // async factory
+```
+
+Optional opts: `confirm`, `cacheDir`, `registry`, `skipSmoke`.
+
+## ValidatorClient
+
+| Member | Description |
+|--------|-------------|
+| `name` | Catalog name |
+| `latency_class` / `latencyClass` | `"inline"` \| `"async"` |
+| `index(message, context)` | Stream / update context — see [index()](/docs/capabilities/indexing) |
+| `judge(message, context)` | Score — see [judge()](/docs/capabilities/judge) |
+
+Both methods are **async** on the client (they await sync or async impls).
+
+## Resolution flow
+
+```
+validator(name)
+  → load registry
+  → language gate (python | ts)
+  → install pinned commit (confirm unless auto-install)
+  → smoke check
+  → load entrypoint
+  → return / memoize ValidatorClient
+```
+
+## Errors
+
+| Error | When |
+|-------|------|
+| `UnknownValidatorError` | Name missing from the catalog |
+| `LanguageNotSupportedError` | Name exists but not for your language |
+| `InstallCancelledError` | User declined install confirmation |
+| `EntrypointError` | Load / interface / return-shape failure |
+| `NetworkError` | Registry or clone network failure |
+| `ChecksumMismatchError` | Integrity check failed (when enabled) |
+
+## Packages
+
+| Language | Package | Import |
+|----------|---------|--------|
+| Python | `galya-reality` | `import galya_reality as reality` |
+| TypeScript | `@galya/reality` | `import { validator, ... } from "@galya/reality"` |

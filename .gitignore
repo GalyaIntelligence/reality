@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+packages/ts/dist/
+docs/.next/
+docs/.source/
+docs/out/
+*.tsbuildinfo
+npm-debug.log*
+
+# Caches / OS
+.cache/
+.DS_Store
+*.log
+.clrun/
+
+# Env
+.env
+.env.*

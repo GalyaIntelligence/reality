@@ -1,0 +1,14 @@
+---
+title: Security
+description: Trust model for third-party validators.
+---
+
+Validators run as third-party code in your process — the same trust model as
+any pip or npm package.
+
+Once installed, a validator can perform whatever the host process can do
+(network calls, file access, etc.). Catalog checks verify schema, import, and
+optional cross-language parity — they are not a security sandbox.
+
+See [SECURITY.md](https://github.com/GalyaIntelligence/reality/blob/main/SECURITY.md)
+in the repository for the full policy.

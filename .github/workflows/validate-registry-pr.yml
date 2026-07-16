@@ -1,0 +1,55 @@
+name: Validate Registry PR
+on:
+  pull_request:
+    paths:
+      - "registry/index.json"
+      - "registry/schema.json"
+      - "registry/README.md"
+      - "scripts/**"
+      - ".github/workflows/validate-registry-pr.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject PRs that touch non-registry files
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          CHANGED=$(git diff --name-only "$BASE"..."$HEAD")
+          echo "Changed files:"
+          echo "$CHANGED"
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              registry/index.json|registry/README.md) ;;
+              *)
+                echo "::error::Registry PRs may only modify registry/index.json (+ optional registry/README.md). Got: $f"
+                exit 1
+                ;;
+            esac
+          done <<< "$CHANGED"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install schema validator
+        run: pip install jsonschema
+
+      - name: Validate registry schema + language rules
+        run: python scripts/validate_registry.py
+
+      - name: Sandbox import + optional parity for changed entries
+        env:
+          GALYA_AUTO_INSTALL: "1"
+        run: python scripts/validate_registry_entries.py

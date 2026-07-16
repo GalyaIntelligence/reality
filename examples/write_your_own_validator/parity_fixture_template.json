@@ -1,0 +1,14 @@
+{
+  "message": {
+    "role": "user",
+    "content": "This response looks ok to me"
+  },
+  "context": {
+    "messages": [
+      { "role": "user", "content": "This response looks ok to me" }
+    ]
+  },
+  "expect": {
+    "score_tolerance": 0.01
+  }
+}

@@ -1,0 +1,5 @@
+name: fake-both
+latency_class: inline
+entrypoints:
+  python: validator:FakeBothValidator
+  ts: validator.ts:FakeBothValidator

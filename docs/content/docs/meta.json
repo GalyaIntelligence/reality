@@ -1,0 +1,13 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "skills",
+    "quickstart",
+    "capabilities",
+    "validators",
+    "integrations",
+    "configuration",
+    "security"
+  ]
+}

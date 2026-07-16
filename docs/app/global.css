@@ -1,0 +1,144 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+:root {
+  --brand: hsl(26, 73%, 51%);
+  --brand-foreground: white;
+  --brand-secondary: #c6bb58;
+  --brand-secondary-foreground: #97890c;
+  --brand-200: hsl(33, 100%, 50%);
+  --landing-foreground: #3f3f2a;
+  --landing-foreground-200: #6b6b3d;
+}
+
+.dark {
+  --brand: #fff383;
+  --brand-foreground: black;
+  --brand-secondary: #fc7744;
+  --brand-secondary-foreground: #521700;
+  --brand-200: #fff7c8;
+  --landing-foreground: #e4e2d0;
+  --landing-foreground-200: #b7af7e;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-secondary-foreground: var(--brand-secondary-foreground);
+  --color-brand-200: var(--brand-200);
+  --color-landing-foreground: var(--landing-foreground);
+  --color-landing-foreground-200: var(--landing-foreground-200);
+
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
+
+.lava-blob {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(40px) saturate(1.35);
+  mix-blend-mode: screen;
+  will-change: transform, border-radius;
+  animation:
+    lava-morph 12s ease-in-out infinite,
+    lava-drift-a 18s ease-in-out infinite;
+}
+
+.lava-blob-b {
+  animation:
+    lava-morph 14s ease-in-out infinite reverse,
+    lava-drift-b 22s ease-in-out infinite;
+}
+
+.lava-blob-c {
+  animation:
+    lava-morph 10s ease-in-out infinite,
+    lava-drift-c 26s ease-in-out infinite;
+  animation-delay: -4s, -6s;
+}
+
+@keyframes lava-morph {
+  0%,
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    border-radius: 50% 60% 30% 60% / 30% 40% 70% 60%;
+  }
+  75% {
+    border-radius: 60% 40% 60% 30% / 70% 50% 40% 50%;
+  }
+}
+
+@keyframes lava-drift-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(-10%, 14%) scale(1.12) rotate(8deg);
+  }
+  66% {
+    transform: translate(8%, -12%) scale(0.9) rotate(-6deg);
+  }
+}
+
+@keyframes lava-drift-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  40% {
+    transform: translate(14%, -10%) scale(1.15) rotate(-10deg);
+  }
+  70% {
+    transform: translate(-12%, 16%) scale(0.88) rotate(7deg);
+  }
+}
+
+@keyframes lava-drift-c {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1.05) rotate(0deg);
+  }
+  50% {
+    transform: translate(-16%, -8%) scale(0.9) rotate(12deg);
+  }
+}
+
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+body {
+  background-color: var(--color-fd-background);
+}

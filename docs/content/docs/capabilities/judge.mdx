@@ -1,0 +1,94 @@
+---
+title: judge()
+description: Score a message against context and read ValidationResult fields.
+---
+
+# judge()
+
+`judge(message, context)` is the scoring call. It returns a
+**ValidationResult**. Every result includes a numeric `score`. Everything else
+is optional.
+
+`judge` is **read-only** by contract: it must not mutate `message` or
+`context`.
+
+## Signature
+
+```text
+judge(message: Message, context: ContextWindow) → ValidationResult (async)
+```
+
+## Result fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `score` | `number` / `float` | yes | Judgement score (typically 0–1) |
+| `label` | `string` | no | Short categorical label |
+| `rationale` | `string` | no | Single free-form summary |
+| `explanations` | `string[]` | no | One or more human-readable explanations |
+| `metadata` | `object` | no | Validator-specific extras |
+
+## Explanations
+
+Use `explanations` when you want structured reasons alongside the score — for
+UI, logging, or evaluation. Validators may omit it entirely.
+
+`rationale` remains available for a single summary string. Prefer
+`explanations` when you need multiple discrete reasons.
+
+## Python
+
+```python
+result = await client.judge(message, context)
+print(result.score)
+print(result.label)
+print(result.rationale)
+if result.explanations:
+    for line in result.explanations:
+        print("-", line)
+```
+
+Example:
+
+```python
+ValidationResult(
+    score=0.92,
+    label="pass",
+    rationale="Response aligns with expected taste signals",
+    explanations=[
+        "Tone matches brand voice",
+        "No policy-sensitive content detected",
+    ],
+    metadata={},
+)
+```
+
+## TypeScript
+
+```typescript
+const result = await client.judge(message, context);
+console.log(result.score, result.label, result.rationale);
+for (const line of result.explanations ?? []) {
+  console.log("-", line);
+}
+```
+
+Example:
+
+```json
+{
+  "score": 0.92,
+  "label": "pass",
+  "rationale": "Response aligns with expected taste signals",
+  "explanations": [
+    "Tone matches brand voice",
+    "No policy-sensitive content detected"
+  ],
+  "metadata": {}
+}
+```
+
+## Related
+
+- [index()](/docs/capabilities/indexing) — feed context before scoring
+- [API model](/docs/capabilities/api-model) — types and `validator()`

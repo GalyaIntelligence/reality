@@ -1,0 +1,4 @@
+name: fake-ts-only
+latency_class: inline
+entrypoints:
+  ts: validator.js:FakeTsOnlyValidator

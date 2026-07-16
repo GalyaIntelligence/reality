@@ -1,0 +1,54 @@
+---
+title: Overview
+description: What validators are and how they fit into Galya Reality.
+---
+
+# Validators
+
+A **validator** is a judgement function you call by name. It reads a message
+and surrounding context, then returns a score — optionally with a label,
+rationale, and explanations.
+
+Validators are **not** shipped inside the SDK. They live in their own repos
+and are installed on demand from Galya’s shared catalog at a pinned commit.
+
+## Lifecycle
+
+1. You call `validator("name")` in Python or TypeScript.
+2. The SDK resolves `name` in the registry, checks language support, and
+   installs the pinned commit (with confirmation unless auto-install is on).
+3. You stream context with `.index()` and score with `.judge()`.
+
+```python
+client = reality.validator("galya-taste")
+result = await client.judge(message, context)
+print(result.score, result.explanations)
+```
+
+## Contract
+
+Every validator implements the same surface:
+
+| Method / field | Role |
+|----------------|------|
+| `name` | Catalog identity |
+| `latency_class` | `"inline"` or `"async"` |
+| `index(message, context)` | Optional state update as messages arrive |
+| `judge(message, context)` | Return a `ValidationResult` — **must not** mutate context |
+
+`judge()` is read-only by contract: it scores, it does not rewrite the agent’s
+history. See [judge()](/docs/capabilities/judge) for the result shape.
+
+## Language support
+
+A validator may ship **Python only**, **TypeScript only**, or **both**.
+Single-language validators are first-class. If you request a name that isn’t
+available in your language, you get a clear error listing what *is* supported.
+
+When both languages are registered, they must agree on scoring for a shared
+parity fixture.
+
+## In this section
+
+- [Galya](/docs/validators/galya) — Galya-maintained validators in the catalog
+- [Write your own](/docs/validators/write-your-own) — build, ship, and register a validator

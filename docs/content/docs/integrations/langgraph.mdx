@@ -1,0 +1,106 @@
+---
+title: LangGraph
+description: Plug Galya Reality into your LangGraph agent via index/judge nodes — graph stays yours.
+---
+
+# LangGraph
+
+Attach Galya as **graph nodes**. Your draft / agent node stays normal and fully
+customizable — Galya only runs `index` / `judge` on the latest message.
+
+## Install
+
+```bash
+pip install galya-reality langgraph langchain-openai langchain-core
+```
+
+Helpers + runnable example:
+[`examples/langgraph`](https://github.com/GalyaIntelligence/reality/tree/main/examples/langgraph).
+
+## Plug into your graph
+
+```python
+from langgraph.graph import END, START, StateGraph
+from galya_reality_langgraph import (
+    make_galya_index_node,
+    make_galya_judge_node,
+)
+
+async def draft(state):
+    # Your agent — any LLM, tools, memory, branching you already use
+    reply = await my_agent.ainvoke(state["messages"])
+    return {"messages": [{"role": "assistant", "content": reply}]}
+
+graph = StateGraph(State)
+graph.add_node("draft", draft)  # yours
+graph.add_node(
+    "galya_index",
+    make_galya_index_node(validator_name="galya-taste"),
+)
+graph.add_node(
+    "galya_judge",
+    make_galya_judge_node(validator_name="galya-taste", pass_threshold=0.7),
+)
+
+graph.add_edge(START, "draft")
+graph.add_edge("draft", "galya_index")
+graph.add_edge("galya_index", "galya_judge")
+graph.add_edge("galya_judge", END)
+
+app = graph.compile()
+result = await app.ainvoke({
+    "messages": [{"role": "user", "content": "Write a short brand-safe thank-you."}],
+})
+
+print(result["galya_score"], result["galya_passed"], result["galya_reason"])
+```
+
+### What Galya owns vs what you own
+
+| Yours | Galya nodes |
+|-------|-------------|
+| Draft / agent / tools / memory | `make_galya_index_node` → `index()` |
+| Graph topology & branching | `make_galya_judge_node` → `judge()` → score fields |
+| When to revise or stop | Optional `route_on_galya_score` / `route_after_gate` |
+
+### State fields after judge
+
+| Field | Meaning |
+|-------|---------|
+| `galya_score` | `0..1` from `judge()` |
+| `galya_reason` | Explanations joined, or rationale |
+| `galya_explanations` | Optional list |
+| `galya_passed` | Set when `pass_threshold` is provided |
+
+### Configure
+
+| Env / arg | Default | Purpose |
+|-----------|---------|---------|
+| `OPENAI_API_KEY` | — | Live LLM (your draft node) |
+| `GALYA_VALIDATOR_NAME` / `validator_name` | `galya-taste` | Catalog validator |
+| `pass_threshold` | `0.7` | Writes `galya_passed` |
+| `index=` / `judge=` | SDK client | Inject mocks |
+
+```bash
+cd examples/langgraph
+GALYA_AUTO_INSTALL=1 OPENAI_API_KEY=sk-... uv run python example_graph.py
+```
+
+## Building blocks
+
+```python
+from galya_reality_langgraph import (
+    make_galya_index_node,
+    make_galya_judge_node,
+    route_on_galya_score,
+    route_after_gate,
+)
+```
+
+## Tests
+
+```bash
+uv run pytest -q
+```
+
+Mocks cover index→judge order and a plug-in graph — no API key or live registry required.

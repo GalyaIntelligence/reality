@@ -1,0 +1,7 @@
+# Copy this template into YOUR OWN validator repository if shipping TypeScript.
+
+name: my-validator
+latency_class: inline  # or async
+entrypoints:
+  ts: validator.ts:MyValidator
+  # python: validator:MyValidator   # uncomment if also shipping Python
