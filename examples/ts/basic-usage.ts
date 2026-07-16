@@ -10,8 +10,7 @@ import { validator, type ContextWindow, type Message } from "@galya/reality";
 async function main() {
   process.env.GALYA_AUTO_INSTALL ??= "1";
 
-  const name = process.env.GALYA_VALIDATOR_NAME ?? "galya-taste";
-  const client = await validator(name);
+  const client = await validator("galya-taste");
 
   const message: Message = {
     role: "user",

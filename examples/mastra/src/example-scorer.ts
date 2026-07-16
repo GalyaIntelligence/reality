@@ -7,12 +7,11 @@
 import { createGalyaScorer } from "./galya-scorer.js";
 
 async function main() {
-  const name = process.env.GALYA_VALIDATOR_NAME ?? "galya-taste";
   process.env.GALYA_AUTO_INSTALL ??= "1";
 
   const scorer = createGalyaScorer({
-    validatorName: name,
-    description: `Score agent replies with Galya "${name}"`,
+    validatorName: "galya-taste",
+    description: 'Score agent replies with Galya "galya-taste"',
   });
 
   const result = await scorer.run({

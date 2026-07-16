@@ -42,7 +42,6 @@ branch on `galya_score` yourself.
 
 ```bash
 export OPENAI_API_KEY=sk-...
-export GALYA_VALIDATOR_NAME=galya-taste
 GALYA_AUTO_INSTALL=1 uv run python example_graph.py
 ```
 

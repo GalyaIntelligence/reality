@@ -7,9 +7,10 @@ The draft / LLM step is a normal graph node you own. Galya only provides
 Env:
   OPENAI_API_KEY         — required for live LLM (or inject generate_reply=)
   OPENAI_MODEL           — default gpt-4o-mini
-  GALYA_VALIDATOR_NAME   — default galya-taste
   GALYA_PASS_THRESHOLD   — default 0.7 (optional; writes galya_passed)
   GALYA_AUTO_INSTALL=1
+
+Examples always use the catalog validator ``galya-taste``.
 """
 
 from __future__ import annotations
@@ -144,7 +145,6 @@ def build_graph(validator_name: str):
 
 
 async def main() -> None:
-    name = os.environ.get("GALYA_VALIDATOR_NAME", "galya-taste")
     threshold = float(os.environ.get("GALYA_PASS_THRESHOLD", "0.7"))
     os.environ.setdefault("GALYA_AUTO_INSTALL", "1")
 
@@ -154,7 +154,7 @@ async def main() -> None:
     )
 
     app = build_agent_with_galya(
-        validator_name=name,
+        validator_name="galya-taste",
         pass_threshold=threshold,
     )
     result = await app.ainvoke({"messages": [{"role": "user", "content": prompt}]})

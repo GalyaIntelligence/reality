@@ -18,12 +18,10 @@ async function main() {
 
   process.env.GALYA_AUTO_INSTALL ??= "1";
 
-  const validatorName = process.env.GALYA_VALIDATOR_NAME ?? "galya-taste";
-
   // 1. Galya plug-in — only the scorer talks to the Reality SDK
   const galyaScorer = createGalyaScorer({
-    validatorName,
-    description: `Score replies with Galya "${validatorName}"`,
+    validatorName: "galya-taste",
+    description: 'Score replies with Galya "galya-taste"',
   });
 
   // 2. Your agent — fully customizable (model, tools, memory, instructions)

@@ -16,8 +16,7 @@ from galya_reality import ContextWindow, Message
 async def main() -> None:
     os.environ.setdefault("GALYA_AUTO_INSTALL", "1")
 
-    name = os.environ.get("GALYA_VALIDATOR_NAME", "galya-taste")
-    client = validators.validator(name)
+    client = validators.validator("galya-taste")
 
     message = Message(role="user", content="Hello from the Galya example")
     context = ContextWindow(messages=[message])

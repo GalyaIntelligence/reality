@@ -20,7 +20,7 @@ import { openai } from "@ai-sdk/openai";
 import { createGalyaScorer } from "./src/galya-scorer.js";
 
 const galyaScorer = createGalyaScorer({
-  validatorName: "galya-taste", // or GALYA_VALIDATOR_NAME
+  validatorName: "galya-taste",
 });
 
 // Your agent — customize freely
@@ -49,7 +49,6 @@ score + reason. Nothing else about the agent is wrapped.
 
 ```bash
 export OPENAI_API_KEY=sk-...
-export GALYA_VALIDATOR_NAME=galya-taste   # optional
 npm run example
 ```
 

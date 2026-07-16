@@ -74,7 +74,7 @@ npm install @galya/reality
 
 from reality import validator
 
-client = validator("groundedness")
+client = validator("galya-taste")
 client.index(message, context)
 result = client.judge(message, context)
 # → score, label?, rationale?, explanations?`}</code>
